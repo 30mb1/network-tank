@@ -10,9 +10,6 @@ from src.models.token import Token
 from src.utils.common import send_tx, short_addr, from_wei
 
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
 
 async def multisend_native(account: HighloadWalletV2, receivers: list[Tuple[nt.Address, int]]) -> nt.Transaction:
     """
@@ -80,16 +77,15 @@ async def transfer_native_batch(transfers: List[Tuple[EverWallet, nt.Address, in
     """
     Transfer a batch of tokens to multiple addresses
     :param transfers: List of tuples with sender Account, receiver address and amount
-    :param logger: Logger
     """
 
     # asynchronously send tokens to multiple addresses
     async def log_send_tx(acc: EverWallet, dst: nt.Address, amount: int):
-        logger.info(f"Account {short_addr(acc.address)} sending {from_wei(amount):.3f} ever to {short_addr(dst)}...")
+        logging.info(f"Account {short_addr(acc.address)} sending {from_wei(amount):.3f} ever to {short_addr(dst)}...")
         tx = await send_tx(
             acc, {"dst": dst, "value": nt.Tokens.from_nano(amount), "payload": nt.Cell(), "bounce": False}
         )
-        logger.info(
+        logging.info(
             f"Account {short_addr(acc.address)} sent {from_wei(amount):.3f} ever to {short_addr(dst)},"
             f" tx: {tx.hash.hex()}"
         )
@@ -102,16 +98,15 @@ async def transfer_token_batch(transfer: List[Tuple[EverWallet, nt.Address, int]
     Transfer a batch of tokens to multiple addresses
     :param transfer: List of tuples with sender Account, receiver address and amount
     :param token: Token model
-    :param logger: Logger
     """
 
     # asynchronously send tokens to multiple addresses
     async def log_send_tx(acc: EverWallet, dst: nt.Address, amount: int):
-        logger.info(
+        logging.info(
             f"Account {short_addr(acc.address)} sending {token.from_dec(amount):.3f} {token.symbol} to {short_addr(dst)}..."
         )
         tx = await token.transfer(acc, dst, amount)
-        logger.info(
+        logging.info(
             f"Account {short_addr(acc.address)} sent {token.from_dec(amount):.3f} {token.symbol} to {short_addr(dst)},"
             f" tx: {tx.hash.hex()}"
         )

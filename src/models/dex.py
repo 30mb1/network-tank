@@ -1,6 +1,6 @@
 import nekoton as nt
 
-from tvm.abi import DexPairAbi, DexRootAbi
+from src.abi import DexPairAbi, DexRootAbi
 
 
 class DexPair:

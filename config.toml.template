@@ -4,6 +4,8 @@ title = "TVM network tank"
 [common]
 keys_file = "keys.txt"
 jrpc = ""
+giver_secret_key = ""
+giver_address = ""
 
 
 [funding]

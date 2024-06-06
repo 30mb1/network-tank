@@ -7,8 +7,6 @@ import logging
 
 from src.models.ever_wallet import EverWallet
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 
 def rotate_archive(filename: str):
@@ -22,7 +20,7 @@ def rotate_archive(filename: str):
     # if keys.txt file exists in current dir, move it to archive
     if os.path.exists(filename):
         os.rename(filename, f"archive_tvm/{filename}.{highest + 1}")
-        logger.info(f"Archived {filename} to archive_tvm/{filename}.{highest + 1}")
+        logging.info(f"Archived {filename} to archive_tvm/{filename}.{highest + 1}")
 
 
 def gen_keys_from_seed(number: int, seed_phrase: str) -> List[nt.KeyPair]:
@@ -40,7 +38,7 @@ def gen_keys_from_seed_file(number: int, filename: str, seed_phrase: str):
     keys = gen_keys_from_seed(number, seed_phrase)
     with open(filename, "w") as f:
         for idx, keypair in enumerate(keys):
-            logger.info(f"Key {idx + 1} generated, public key: {keypair.public_key.encode('hex')}")
+            logging.info(f"Key {idx + 1} generated, public key: {keypair.public_key.encode('hex')}")
             addr = EverWallet.compute_address(nt.PublicKey.from_bytes(bytes.fromhex(str(keypair.public_key))))
             f.write(f"{keypair.secret_key.hex()},{keypair.public_key.encode('hex')},{addr}\n")
-    logger.info(f"Generated {number} keys and dumped to {filename}")
+    logging.info(f"Generated {number} keys and dumped to {filename}")

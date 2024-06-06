@@ -4,6 +4,8 @@ from typing import TypedDict
 class CommonConfig(TypedDict):
     keys_file: str
     jrpc: str
+    giver_secret_key: str
+    giver_address: str
 
 
 class FundingConfig(TypedDict):

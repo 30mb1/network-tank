@@ -2,6 +2,7 @@ from typing import Optional
 
 import nekoton as nt
 
+
 wallet_abi = nt.ContractAbi(
     """{
     "ABI version": 2,

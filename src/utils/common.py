@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+from threading import Thread
 from typing import List, Tuple, TypedDict
 
 import nekoton as nt
@@ -8,8 +9,8 @@ import nekoton as nt
 from src.models.ever_wallet import EverWallet
 from src.utils.keys import gen_keys_from_seed
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
 
 def from_wei(value: int | nt.Tokens | float) -> float:
@@ -89,7 +90,24 @@ async def send_tx(account: EverWallet, tx_data: TxData, retry_count=3, timeout=6
         try:
             return await asyncio.wait_for(account.send(**tx_data), timeout=timeout)
         except TimeoutError:
-            logger.error(f"Timeout#{i} while sending tx from {account.address} to {tx_data['dst']}, retrying...")
+            logging.error(f"Timeout#{i} while sending tx from {account.address} to {tx_data['dst']}, retrying...")
         except RuntimeError:
-            logger.error(f"Message expired#{i}, retrying...")
+            logging.error(f"Message expired#{i}, retrying...")
     raise Exception(f"Timeout while sending tx")
+
+
+class SyncThread(Thread):
+    result = None
+
+    def run(self):
+        self.result = asyncio.run(self._target(*self._args, **self._kwargs))  # type: ignore
+
+
+def to_sync(func):
+    def wrapper(*args, **kwargs):
+        thread = SyncThread(target=func, args=args, kwargs=kwargs)
+        thread.start()
+        thread.join()
+        return thread.result
+
+    return wrapper
