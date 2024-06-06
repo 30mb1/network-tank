@@ -5,6 +5,7 @@ __pycache__/
 .idea
 *.txt
 *.toml
+archive_tvm
 # C extensions
 *.so
 
