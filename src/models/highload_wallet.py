@@ -166,9 +166,11 @@ class HighloadWalletV2:
 
         account_state = await self.get_account_state()
         if account_state is not None and account_state.status == _nt.AccountStatus.Active:
-            self._initialized = True
             if account_state.state_init.data is None:
                 raise RuntimeError("Account state does not contain data")
+                # NOTE: Update wallet_id just in case
+            self._wallet_id = account_state.state_init.data.as_slice().load_u32()
+            self._initialized = True
 
             return None
         else:

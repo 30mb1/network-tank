@@ -1,11 +1,9 @@
+import argparse
 import asyncio
-from typing import TypedDict
-
-import nekoton as nt
+import random
 import tomllib
 
-import argparse
-import random
+import nekoton as nt
 
 from src.models.ever_wallet import EverWallet
 from src.utils.common import get_accounts_file, send_tx, TxData
