@@ -1,0 +1,17 @@
+title = "TVM network tank"
+
+
+[common]
+keys_file = "keys.txt"
+jrpc = ""
+
+
+[funding]
+funding_acc_key = ""
+# human-readable amout of evers
+funding_amount = 10
+
+
+[native-tank]
+messages_count = 1_000_000
+message_timeout = 5
