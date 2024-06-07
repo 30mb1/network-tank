@@ -27,8 +27,9 @@ async def main():
     transport = nt.JrpcTransport(raw_config["common"]["jrpc"])
     await transport.check_connection()
 
+    wallet_type = raw_config["strat_2"]["wallet_type"]
     # initializing wallets
-    accounts = get_accounts_file(raw_config["common"]["keys_file"], transport)
+    accounts = get_accounts_file(raw_config["common"]["keys_file"], transport, type_=wallet_type)
     funding_keypair = nt.KeyPair(bytes.fromhex(raw_config["funding"]["funding_acc_key"]))
     giver_keypair = nt.KeyPair(bytes.fromhex(raw_config["common"]["giver_secret_key"]))
     giver_address = nt.Address(raw_config["common"]["giver_address"])

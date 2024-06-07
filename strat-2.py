@@ -22,8 +22,9 @@ async def main():
     transport = nt.JrpcTransport(raw_config["common"]["jrpc"])
     await transport.check_connection()
 
+    wallet_type = raw_config["strat_2"]["wallet_type"]
     # initializing wallets
-    accounts = get_accounts_file(raw_config["common"]["keys_file"], transport, type_=WalletType.HIGHLOAD)
+    accounts = get_accounts_file(raw_config["common"]["keys_file"], transport, type_=wallet_type)
     msgs_sent = 0
     batch_count = raw_config["strat_2"]["batch_count"]
     messages_per_batch = raw_config["strat_2"]["messages_per_batch"]
