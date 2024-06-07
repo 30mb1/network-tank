@@ -25,7 +25,7 @@ async def main():
     # initializing wallets
     accounts = get_accounts_file(raw_config["common"]["keys_file"], transport)
     msgs_sent = 0
-    total_msgs = raw_config["native_tank"]["messages_count"]
+    total_msgs = raw_config["strat_1"]["messages_count"]
     logging.info(f"Sending {total_msgs} messages from {len(accounts)} accounts")
     accs_queue = queue.Queue()
     for acc in accounts:
@@ -34,7 +34,7 @@ async def main():
     async def send_random_messages():
         nonlocal msgs_sent
 
-        msg_timeout = raw_config["native_tank"]["message_timeout"]
+        msg_timeout = raw_config["strat_1"]["message_timeout"]
         tx_base = {"value": nt.Tokens("0.1"), "payload": nt.Cell(), "bounce": False, "timeout": msg_timeout}
         while (total_msgs - msgs_sent) > 0:
             sender_account = accs_queue.get()

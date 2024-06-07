@@ -16,6 +16,13 @@ funding_acc_key = ""
 funding_amount = 10
 
 
-[native-tank]
+[strat_1]
 messages_count = 1_000_000
-message_timeout = 5
+message_timeout = 10
+
+
+[strat_2]
+messages_per_batch = 100
+message_timeout = 10
+batch_interval = 10
+batch_count = 10

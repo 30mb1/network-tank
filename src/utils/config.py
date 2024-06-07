@@ -20,8 +20,15 @@ class FundingConfig(TypedDict):
     funding_amount: float
 
 
-class NativeTankConfig(TypedDict):
+class Strat1(TypedDict):
     messages_count: int
+    message_timeout: int
+
+
+class Strat2(TypedDict):
+    messages_per_batch: int
+    batch_interval: int
+    batch_count: int
     message_timeout: int
 
 
@@ -29,4 +36,5 @@ class Config(TypedDict):
     title: str
     common: CommonConfig
     funding: FundingConfig
-    native_tank: NativeTankConfig
+    strat_1: Strat1
+    strat_2: Strat2

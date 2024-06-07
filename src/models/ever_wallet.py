@@ -41,6 +41,16 @@ class EverWallet:
         return cls.compute_state_init(public_key).compute_address(workchain)
 
     @staticmethod
+    def from_address(
+        transport: nt.Transport, keypair: nt.KeyPair, address: nt.Address
+    ) -> "EverWallet":
+        wallet = EverWallet(transport, keypair)
+        wallet._initialized = True
+        wallet._address = address
+        return wallet
+
+
+    @staticmethod
     def compute_state_init(public_key: nt.PublicKey) -> nt.StateInit:
         data = nt.Cell.build(
             abi=wallet_data_abi,
@@ -67,6 +77,29 @@ class EverWallet:
     @property
     def keypair(self) -> nt.KeyPair:
         return self._keypair
+
+    async def encode_ext_msg(self, dst: nt.Address, value: nt.Tokens, payload: nt.Cell, bounce: bool, timeout: int = 40) -> nt.SignedExternalMessage:
+        state_init = await self.__get_state_init()
+        signature_id = await self._transport.get_signature_id()
+        return send_transaction.encode_external_message(
+            self._address,
+            input={
+                "dest": dst,
+                "value": value,
+                "bounce": bounce,
+                "flags": 3,
+                "payload": payload,
+            },
+            public_key=self._keypair.public_key,
+            state_init=state_init,
+            timeout=timeout
+        ).sign(self._keypair, signature_id)
+
+    async def send_ext_msg(self, message: nt.SignedExternalMessage) -> nt.Transaction:
+        tx = await self._transport.send_external_message(message)
+        if tx is None:
+            raise RuntimeError("Message expired")
+        return tx
 
     async def send(
         self, dst: nt.Address, value: nt.Tokens, payload: nt.Cell = nt.Cell(), bounce: bool = False, timeout: int = 40
