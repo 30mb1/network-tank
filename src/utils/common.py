@@ -62,7 +62,7 @@ def get_keypairs_file(file: str) -> List[nt.KeyPair]:
         with open(file) as f:
             keys = f.readlines()
             keys = [key.strip().split(",") for key in keys]
-            (keys, public_keys, addresses) = list(zip(*keys))
+            (keys, public_keys) = list(zip(*keys))
     except Exception as e:
         logger.error(f"Error while reading keys file: {e}")
         exit(1)

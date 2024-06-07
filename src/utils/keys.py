@@ -1,12 +1,8 @@
+import logging
+import os
 from typing import List
 
 import nekoton as nt
-import os
-
-import logging
-
-from src.models.ever_wallet import EverWallet
-
 
 
 def rotate_archive(filename: str):
@@ -39,6 +35,5 @@ def gen_keys_from_seed_file(number: int, filename: str, seed_phrase: str):
     with open(filename, "w") as f:
         for idx, keypair in enumerate(keys):
             logging.info(f"Key {idx + 1} generated, public key: {keypair.public_key.encode('hex')}")
-            addr = EverWallet.compute_address(nt.PublicKey.from_bytes(bytes.fromhex(str(keypair.public_key))))
-            f.write(f"{keypair.secret_key.hex()},{keypair.public_key.encode('hex')},{addr}\n")
+            f.write(f"{keypair.secret_key.hex()},{keypair.public_key.encode('hex')}\n")
     logging.info(f"Generated {number} keys and dumped to {filename}")

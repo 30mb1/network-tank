@@ -10,6 +10,7 @@ from src.utils.config import Config
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-c", "--config", type=str, default="config.toml", help="TOML config filename")
+parser.add_argument('-t', '--type', type=str, choices=['highload', 'ever_wallet'], help='Wallet type')
 args = parser.parse_args()
 
 
@@ -19,7 +20,8 @@ async def print_balances():
 
     transport = nt.JrpcTransport(raw_config["common"]["jrpc"])
     await transport.check_connection()
-    accounts = get_accounts_file(raw_config["common"]["keys_file"], transport)
+
+    accounts = get_accounts_file(raw_config["common"]["keys_file"], transport, args.type)
 
     logging.info(f"Fetched balances for provided accounts:")
     balances = await asyncio.gather(*[acc.get_balance() for acc in accounts])
