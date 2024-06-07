@@ -15,19 +15,20 @@ class CommonConfig(TypedDict):
     giver_address: str
 
 
+class WalletType(StrEnum):
+    HIGHLOAD = "highload"
+    WALLET = "ever_wallet"
+
+
 class FundingConfig(TypedDict):
     funding_acc_key: str
     funding_amount: float
+    deposit_wallet_type: WalletType
 
 
 class Strat1(TypedDict):
     messages_count: int
     message_timeout: int
-
-
-class WalletType(StrEnum):
-    HIGHLOAD = "highload"
-    WALLET = "ever_wallet"
 
 
 class Strat2(TypedDict):

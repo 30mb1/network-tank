@@ -27,12 +27,13 @@ async def main():
     transport = nt.JrpcTransport(raw_config["common"]["jrpc"])
     await transport.check_connection()
 
-    wallet_type = raw_config["strat_2"]["wallet_type"]
+    wallet_type = raw_config["funding"]["deposit_wallet_type"]
     # initializing wallets
     accounts = get_accounts_file(raw_config["common"]["keys_file"], transport, type_=wallet_type)
     funding_keypair = nt.KeyPair(bytes.fromhex(raw_config["funding"]["funding_acc_key"]))
     giver_keypair = nt.KeyPair(bytes.fromhex(raw_config["common"]["giver_secret_key"]))
     giver_address = nt.Address(raw_config["common"]["giver_address"])
+
     funding_wallet = HighloadWalletV2(transport=transport, keypair=funding_keypair)
     if raw_config["common"]["giver_acc_type"] == GiverAccType.GIVER:
         giver_wallet = GiverV2(transport=transport, address=giver_address, keypair=giver_keypair)
