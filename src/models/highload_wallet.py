@@ -118,7 +118,8 @@ class HighloadWalletV2:
         state_init = await self.__get_state_init()
         signature_id = await self._transport.get_signature_id()
 
-        expire_at = self._transport.clock.now_sec + _default_ttl if timeout is None else timeout
+        ttl = _default_ttl if timeout is None else timeout
+        expire_at = self._transport.clock.now_sec + ttl
 
         messages_dict = []
         for i, (message, flags) in enumerate(messages):
