@@ -1,12 +1,15 @@
 import asyncio
 import logging
 import os
+from enum import Enum
 from threading import Thread
 from typing import List, Tuple, TypedDict
 
 import nekoton as nt
 
 from src.models.ever_wallet import EverWallet
+from src.models.highload_wallet import HighloadWalletV2
+from src.utils.config import WalletType
 from src.utils.keys import gen_keys_from_seed
 
 
@@ -68,14 +71,20 @@ def get_keypairs_file(file: str) -> List[nt.KeyPair]:
     return [nt.KeyPair(bytes.fromhex(key)) for key in keys]
 
 
-def get_accounts_seed(seed: str, count: int, transport: nt.Transport) -> List[EverWallet]:
+def get_accounts_seed(seed: str, count: int, transport: nt.Transport, type_: WalletType = WalletType.WALLET) -> List[EverWallet | HighloadWalletV2]:
     keys = gen_keys_from_seed(count, seed)
-    return [EverWallet(transport=transport, keypair=keypair) for keypair in keys]
+    if type_ == WalletType.HIGHLOAD:
+        return [HighloadWalletV2(transport=transport, keypair=keypair) for keypair in keys]
+    else:
+        return [EverWallet(transport=transport, keypair=keypair) for keypair in keys]
 
 
-def get_accounts_file(file: str, transport: nt.Transport) -> List[EverWallet]:
-    keypairs = get_keypairs_file(file)
-    return [EverWallet(transport=transport, keypair=keypair) for keypair in keypairs]
+def get_accounts_file(file: str, transport: nt.Transport, type_: WalletType = WalletType.WALLET) -> List[EverWallet | HighloadWalletV2]:
+    keys = get_keypairs_file(file)
+    if type_ == WalletType.HIGHLOAD:
+        return [HighloadWalletV2(transport=transport, keypair=keypair) for keypair in keys]
+    else:
+        return [EverWallet(transport=transport, keypair=keypair) for keypair in keys]
 
 
 def short_addr(addr: nt.Address):
@@ -90,7 +99,7 @@ class TxData(TypedDict):
     timeout: int
 
 
-async def send_tx(account: EverWallet, tx_data: TxData, retry_count=3, timeout=60, silent=True) -> nt.Transaction:
+async def send_tx(account: EverWallet | HighloadWalletV2, tx_data: TxData, retry_count=3, timeout=60, silent=True) -> nt.Transaction:
     for i in range(retry_count):
         try:
             return await asyncio.wait_for(account.send(**tx_data), timeout=timeout)

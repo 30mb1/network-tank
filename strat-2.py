@@ -7,7 +7,7 @@ import tomllib
 
 import nekoton as nt
 
-from src.utils.common import get_accounts_file, send_tx, TxData
+from src.utils.common import get_accounts_file, send_tx, TxData, WalletType
 from src.utils.config import Config
 
 parser = argparse.ArgumentParser()
@@ -23,7 +23,7 @@ async def main():
     await transport.check_connection()
 
     # initializing wallets
-    accounts = get_accounts_file(raw_config["common"]["keys_file"], transport)
+    accounts = get_accounts_file(raw_config["common"]["keys_file"], transport, type_=WalletType.HIGHLOAD)
     msgs_sent = 0
     batch_count = raw_config["strat_2"]["batch_count"]
     messages_per_batch = raw_config["strat_2"]["messages_per_batch"]

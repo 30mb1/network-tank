@@ -92,7 +92,7 @@ class HighloadWalletV2:
         payload: Optional[_nt.Cell] = None,
         bounce: bool = False,
         state_init: Optional[_nt.StateInit] = None,
-        ttl: Optional[int] = None,
+        timeout: Optional[int] = None,
     ) -> _nt.Transaction:
         internal_message = _nt.Message(
             header=_nt.InternalMessageHeader(  # type: ignore
@@ -104,13 +104,13 @@ class HighloadWalletV2:
             state_init=state_init,
         )
 
-        tx = await self.send_raw([(internal_message, 3)], ttl)
+        tx = await self.send_raw([(internal_message, 3)], timeout)
         return tx
 
     async def send_raw(
         self,
         messages: List[tuple[_nt.Message, int]],
-        ttl: Optional[int] = None,
+        timeout: Optional[int] = None,
     ) -> _nt.Transaction:
         if len(messages) > 255:
             raise RuntimeError("Too many messages at once")
@@ -118,7 +118,7 @@ class HighloadWalletV2:
         state_init = await self.__get_state_init()
         signature_id = await self._transport.get_signature_id()
 
-        expire_at = self._transport.clock.now_sec + _default_ttl if ttl is None else ttl
+        expire_at = self._transport.clock.now_sec + _default_ttl if timeout is None else timeout
 
         messages_dict = []
         for i, (message, flags) in enumerate(messages):

@@ -26,3 +26,5 @@ messages_per_batch = 100
 message_timeout = 10
 batch_interval = 10
 batch_count = 10
+# highload or ever_wallet
+wallet_type = "ever_wallet"

@@ -25,11 +25,18 @@ class Strat1(TypedDict):
     message_timeout: int
 
 
+class WalletType(Enum):
+    HIGHLOAD = "highload"
+    WALLET = "ever_wallet"
+
+
 class Strat2(TypedDict):
     messages_per_batch: int
     batch_interval: int
     batch_count: int
     message_timeout: int
+    # highload or ever_wallet
+    wallet_type: WalletType
 
 
 class Config(TypedDict):
