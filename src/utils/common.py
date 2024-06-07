@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import os
-from enum import Enum
 from threading import Thread
 from typing import List, Tuple, TypedDict
 
@@ -11,7 +10,6 @@ from src.models.ever_wallet import EverWallet
 from src.models.highload_wallet import HighloadWalletV2
 from src.utils.config import WalletType
 from src.utils.keys import gen_keys_from_seed
-
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 

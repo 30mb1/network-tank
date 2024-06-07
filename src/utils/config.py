@@ -1,8 +1,8 @@
-from enum import Enum
+from enum import Enum, StrEnum
 from typing import TypedDict
 
 
-class GiverAccType(Enum):
+class GiverAccType(StrEnum):
     GIVER = "giver"
     WALLET = "ever_wallet"
 
@@ -25,7 +25,7 @@ class Strat1(TypedDict):
     message_timeout: int
 
 
-class WalletType(Enum):
+class WalletType(StrEnum):
     HIGHLOAD = "highload"
     WALLET = "ever_wallet"
 
