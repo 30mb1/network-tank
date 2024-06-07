@@ -4,6 +4,8 @@ title = "TVM network tank"
 [common]
 keys_file = "keys.txt"
 jrpc = ""
+# giver or ever_wallet
+giver_acc_type = "giver"
 giver_secret_key = ""
 giver_address = ""
 

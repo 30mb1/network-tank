@@ -5,10 +5,11 @@ import tomllib
 
 import nekoton as nt
 
+from src.models.ever_wallet import EverWallet
 from src.models.giver_v2 import GiverV2
 from src.models.highload_wallet import HighloadWalletV2
 from src.utils.common import get_accounts_file, to_wei, from_wei
-from src.utils.config import Config
+from src.utils.config import Config, GiverAccType
 from src.utils.multisend import multisend_native
 
 parser = argparse.ArgumentParser()
@@ -32,7 +33,10 @@ async def main():
     giver_keypair = nt.KeyPair(bytes.fromhex(raw_config["common"]["giver_secret_key"]))
     giver_address = nt.Address(raw_config["common"]["giver_address"])
     funding_wallet = HighloadWalletV2(transport=transport, keypair=funding_keypair)
-    giver_wallet = GiverV2(transport=transport, address=giver_address, keypair=giver_keypair)
+    if raw_config["common"]["giver_acc_type"] == GiverAccType.GIVER:
+        giver_wallet = GiverV2(transport=transport, address=giver_address, keypair=giver_keypair)
+    else:
+        giver_wallet = EverWallet(transport=transport, keypair=giver_keypair)
 
     # fetching balances for giver and funding wallet
     funding_balance = from_wei(await funding_wallet.get_balance())
@@ -47,7 +51,7 @@ async def main():
     min_balance = funding_amount * len(accounts) + (len(accounts) / HIGHLOAD_WALLET_MAX_MSGS) * 2
     if funding_balance < min_balance:
         logging.info(f"Refilling funding wallet from giver. Required: {min_balance:.1f}, have: {funding_balance:.1f}")
-        await giver_wallet.send(funding_wallet.address, nt.Tokens(str(min_balance)))
+        await giver_wallet.send(funding_wallet.address, nt.Tokens.from_nano(to_wei(min_balance)))
 
     logging.info(f"Sending {len(accounts)} accounts {raw_config['funding']['funding_amount']} evers each")
     # divide accounts in 255-sized chunks

@@ -5,7 +5,7 @@
 groups = ["default"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:cba5154f7167ea7b4b221832baebac34ee35071a5447347dfc4c569574993fcf"
+content_hash = "sha256:296038c7072ed43ff9faf485f0b074d6ac39f623b2569f29de4fa09fea050552"
 
 [[package]]
 name = "black"
@@ -68,11 +68,17 @@ files = [
 
 [[package]]
 name = "nekoton"
-version = "0.0.0"
+version = "0.1.19"
 requires_python = ">=3.9"
-path = "../nekoton-python"
 summary = ""
 groups = ["default"]
+files = [
+    {file = "nekoton-0.1.19-cp311-cp311-macosx_10_12_x86_64.whl", hash = "sha256:2e8207fbf62146d7a4286f85e8a04585ab39c941d2995af956db46aabe810813"},
+    {file = "nekoton-0.1.19-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:eb31198dbf2119c603e3d0e902e968f7fb686fda46c7a0bec09117dbb98e6987"},
+    {file = "nekoton-0.1.19-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:c34965752e2a8f9fc251c366d41ff675726c1e426185c3e97f42b0e7e5c28b5b"},
+    {file = "nekoton-0.1.19-cp311-none-win_amd64.whl", hash = "sha256:64ad1529eff3d95e1f54dc3549e97d48effc8da89151d1995561151a5a4c992a"},
+    {file = "nekoton-0.1.19.tar.gz", hash = "sha256:e56bb25bc9698a9b48f5127e9ec2eb5ab8ee266970a5122aa426f3586f6cb064"},
+]
 
 [[package]]
 name = "packaging"

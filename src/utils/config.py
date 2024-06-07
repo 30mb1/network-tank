@@ -1,9 +1,16 @@
+from enum import Enum
 from typing import TypedDict
+
+
+class GiverAccType(Enum):
+    GIVER = "giver"
+    WALLET = "ever_wallet"
 
 
 class CommonConfig(TypedDict):
     keys_file: str
     jrpc: str
+    giver_acc_type: GiverAccType
     giver_secret_key: str
     giver_address: str
 

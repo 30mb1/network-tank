@@ -68,6 +68,11 @@ def get_keypairs_file(file: str) -> List[nt.KeyPair]:
     return [nt.KeyPair(bytes.fromhex(key)) for key in keys]
 
 
+def get_accounts_seed(seed: str, count: int, transport: nt.Transport) -> List[EverWallet]:
+    keys = gen_keys_from_seed(count, seed)
+    return [EverWallet(transport=transport, keypair=keypair) for keypair in keys]
+
+
 def get_accounts_file(file: str, transport: nt.Transport) -> List[EverWallet]:
     keypairs = get_keypairs_file(file)
     return [EverWallet(transport=transport, keypair=keypair) for keypair in keypairs]
@@ -85,14 +90,16 @@ class TxData(TypedDict):
     timeout: int
 
 
-async def send_tx(account: EverWallet, tx_data: TxData, retry_count=3, timeout=60) -> nt.Transaction:
+async def send_tx(account: EverWallet, tx_data: TxData, retry_count=3, timeout=60, silent=True) -> nt.Transaction:
     for i in range(retry_count):
         try:
             return await asyncio.wait_for(account.send(**tx_data), timeout=timeout)
         except TimeoutError:
-            logging.error(f"Timeout#{i} while sending tx from {account.address} to {tx_data['dst']}, retrying...")
+            if not silent:
+                logging.error(f"Timeout#{i} while sending tx from {short_addr(account.address)} to {short_addr(tx_data['dst'])}, retrying...")
         except RuntimeError:
-            logging.error(f"Message expired#{i}, retrying...")
+            if not silent:
+                logging.error(f"Message expired#{i}, retrying...")
     raise Exception(f"Timeout while sending tx")
 
 

@@ -69,7 +69,7 @@ class EverWallet:
         return self._keypair
 
     async def send(
-        self, dst: nt.Address, value: nt.Tokens, payload: nt.Cell, bounce: bool = False, timeout: int = 40
+        self, dst: nt.Address, value: nt.Tokens, payload: nt.Cell = nt.Cell(), bounce: bool = False, timeout: int = 40
     ) -> nt.Transaction:
         state_init = await self.__get_state_init()
 
