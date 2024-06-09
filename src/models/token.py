@@ -107,7 +107,6 @@ class Tip3Token(Token):
             "value": nt.Tokens("0.25"),
             "bounce": True,
             "payload": payload,
-            "timeout": 30
+            "timeout": 30,
         }
         return await send_tx(sender, tx_data)
-

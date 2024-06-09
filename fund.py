@@ -8,7 +8,7 @@ import nekoton as nt
 from src.models.ever_wallet import EverWallet
 from src.models.giver_v2 import GiverV2
 from src.models.highload_wallet import HighloadWalletV2
-from src.utils.common import get_accounts_file, to_wei, from_wei
+from src.utils.common import get_accounts_file, to_wei, from_wei, get_accounts_seed, get_accounts
 from src.utils.config import Config, GiverAccType
 from src.utils.multisend import multisend_native
 
@@ -24,18 +24,21 @@ async def main():
     with open(args.config, "rb") as f:
         raw_config: Config = tomllib.load(f)
 
-    transport = nt.JrpcTransport(raw_config["common"]["jrpc"])
+    common_config = raw_config["common"]
+    funding_config = raw_config["funding"]
+
+    transport = nt.JrpcTransport(common_config["jrpc"])
     await transport.check_connection()
 
-    wallet_type = raw_config["funding"]["deposit_wallet_type"]
-    # initializing wallets
-    accounts = get_accounts_file(raw_config["common"]["keys_file"], transport, type_=wallet_type)
-    funding_keypair = nt.KeyPair(bytes.fromhex(raw_config["funding"]["funding_acc_key"]))
-    giver_keypair = nt.KeyPair(bytes.fromhex(raw_config["common"]["giver_secret_key"]))
-    giver_address = nt.Address(raw_config["common"]["giver_address"])
+    wallet_type = funding_config["deposit_wallet_type"]
+    accounts = get_accounts(transport, common_config, wallet_type)
+
+    funding_keypair = nt.KeyPair(bytes.fromhex(funding_config["funding_acc_key"]))
+    giver_keypair = nt.KeyPair(bytes.fromhex(common_config["giver_secret_key"]))
+    giver_address = nt.Address(common_config["giver_address"])
 
     funding_wallet = HighloadWalletV2(transport=transport, keypair=funding_keypair)
-    if raw_config["common"]["giver_acc_type"] == GiverAccType.GIVER:
+    if common_config["giver_acc_type"] == GiverAccType.GIVER:
         giver_wallet = GiverV2(transport=transport, address=giver_address, keypair=giver_keypair)
     else:
         giver_wallet = EverWallet(transport=transport, keypair=giver_keypair)
@@ -48,12 +51,13 @@ async def main():
     logging.info(f"Giver wallet: {giver_wallet.address}, balance: {giver_balance:.1f}")
 
     # checking that funding wallet has enough evers to fund all accounts
-    funding_amount = raw_config["funding"]["funding_amount"]
+    funding_amount = funding_config["funding_amount"]
     # we suppose highload wallet needs 2 evers of tech costs for sending 255 msgs pack
     min_balance = funding_amount * len(accounts) + (len(accounts) / HIGHLOAD_WALLET_MAX_MSGS) * 2
     if funding_balance < min_balance:
         logging.info(f"Refilling funding wallet from giver. Required: {min_balance:.1f}, have: {funding_balance:.1f}")
-        await giver_wallet.send(funding_wallet.address, nt.Tokens.from_nano(to_wei(min_balance)))
+        tx = await giver_wallet.send(funding_wallet.address, nt.Tokens.from_nano(to_wei(min_balance)))
+        print(tx)
 
     logging.info(f"Sending {len(accounts)} accounts {raw_config['funding']['funding_amount']} evers each")
     # divide accounts in 255-sized chunks

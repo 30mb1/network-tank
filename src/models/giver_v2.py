@@ -2,7 +2,8 @@ from typing import Optional
 
 import nekoton as _nt
 
-_giver_v2_abi = _nt.ContractAbi("""{"ABI version": 2,
+_giver_v2_abi = _nt.ContractAbi(
+    """{"ABI version": 2,
     "header": ["time", "expire"],
     "functions": [
         {
@@ -41,7 +42,8 @@ _giver_v2_abi = _nt.ContractAbi("""{"ABI version": 2,
     ],
     "events": [
     ]
-}""")
+}"""
+)
 
 _giver_v2_constructor = _giver_v2_abi.get_function("constructor")
 _giver_v2_send_grams = _giver_v2_abi.get_function("sendTransaction")
@@ -67,11 +69,7 @@ class GiverV2:
         # Prepare external message
         message = _giver_v2_send_grams.encode_external_message(
             self.address,
-            input={
-                "dest": target,
-                "value": amount,
-                "bounce": bounce
-            },
+            input={"dest": target, "value": amount, "bounce": bounce},
             public_key=self._keypair.public_key,
         ).sign(self._keypair, signature_id)
 

@@ -149,6 +149,7 @@ class HighloadWalletV2:
         tx = await self._transport.send_external_message(external_message)
         if tx is None:
             raise RuntimeError("Message expired")
+
         return tx
 
     async def get_account_state(self) -> Optional[_nt.AccountState]:

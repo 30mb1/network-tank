@@ -8,7 +8,7 @@ import nekoton as nt
 
 from src.models.ever_wallet import EverWallet
 from src.models.highload_wallet import HighloadWalletV2
-from src.utils.config import WalletType
+from src.utils.config import WalletType, CommonConfig
 from src.utils.keys import gen_keys_from_seed
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -69,7 +69,20 @@ def get_keypairs_file(file: str) -> List[nt.KeyPair]:
     return [nt.KeyPair(bytes.fromhex(key)) for key in keys]
 
 
-def get_accounts_seed(seed: str, count: int, transport: nt.Transport, type_: WalletType = WalletType.WALLET) -> List[EverWallet | HighloadWalletV2]:
+def get_accounts(transport: nt.Transport, config: CommonConfig, wallet_type: WalletType) -> List[EverWallet | HighloadWalletV2]:
+    if config["keys_file"]:
+        logging.info(f"Using keys file {config['keys_file']} for getting accounts")
+        return get_accounts_file(config["keys_file"], transport, wallet_type)
+    else:
+        logging.info(f"Using seed for getting accounts")
+        if not (config["seed_phrase"] and config["accounts_num"]):
+            raise Exception("Seed phrase and accounts number must be provided in config")
+        return get_accounts_seed(config["seed_phrase"], config["accounts_num"], transport, wallet_type)
+
+
+def get_accounts_seed(
+    seed: str, count: int, transport: nt.Transport, type_: WalletType = WalletType.WALLET
+) -> List[EverWallet | HighloadWalletV2]:
     keys = gen_keys_from_seed(count, seed)
     if type_ == WalletType.HIGHLOAD:
         return [HighloadWalletV2(transport=transport, keypair=keypair) for keypair in keys]
@@ -77,7 +90,9 @@ def get_accounts_seed(seed: str, count: int, transport: nt.Transport, type_: Wal
         return [EverWallet(transport=transport, keypair=keypair) for keypair in keys]
 
 
-def get_accounts_file(file: str, transport: nt.Transport, type_: WalletType = WalletType.WALLET) -> List[EverWallet | HighloadWalletV2]:
+def get_accounts_file(
+    file: str, transport: nt.Transport, type_: WalletType = WalletType.WALLET
+) -> List[EverWallet | HighloadWalletV2]:
     keys = get_keypairs_file(file)
     if type_ == WalletType.HIGHLOAD:
         return [HighloadWalletV2(transport=transport, keypair=keypair) for keypair in keys]
@@ -97,13 +112,17 @@ class TxData(TypedDict):
     timeout: int
 
 
-async def send_tx(account: EverWallet | HighloadWalletV2, tx_data: TxData, retry_count=3, timeout=60, silent=True) -> nt.Transaction:
+async def send_tx(
+    account: EverWallet | HighloadWalletV2, tx_data: TxData, retry_count=3, timeout=60, silent=True
+) -> nt.Transaction:
     for i in range(retry_count):
         try:
             return await asyncio.wait_for(account.send(**tx_data), timeout=timeout)
         except TimeoutError:
             if not silent:
-                logging.error(f"Timeout#{i} while sending tx from {short_addr(account.address)} to {short_addr(tx_data['dst'])}, retrying...")
+                logging.error(
+                    f"Timeout#{i} while sending tx from {short_addr(account.address)} to {short_addr(tx_data['dst'])}, retrying..."
+                )
         except RuntimeError:
             if not silent:
                 logging.error(f"Message expired#{i}, retrying...")

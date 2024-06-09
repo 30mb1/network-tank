@@ -10,7 +10,6 @@ from src.models.token import Token
 from src.utils.common import send_tx, short_addr, from_wei
 
 
-
 async def multisend_native(account: HighloadWalletV2, receivers: list[Tuple[nt.Address, int]]) -> nt.Transaction:
     """
     Send tokens to multiple addresses in one transaction

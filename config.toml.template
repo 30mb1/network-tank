@@ -2,7 +2,11 @@ title = "TVM network tank"
 
 
 [common]
+# you should use gen_keys.py and specify keys_file
+# or just put here seed_phrase + accounts_num and generate keys on the fly
 keys_file = "keys.txt"
+seed_phrase = "famous canal panda..."
+accounts_num = 100
 jrpc = ""
 # giver or ever_wallet
 giver_acc_type = "giver"
@@ -11,20 +15,28 @@ giver_address = ""
 
 
 [funding]
+ # secret key of the account that will fund the wallets
 funding_acc_key = ""
-# human-readable amout of evers
+ # amount that will be send to all test accounts, human-readable, e.g. 10.5
 funding_amount = 10
+ # type of accounts for deposit, highload or ever_wallet, depending on what you want to use in test
+deposit_wallet_type = "highload"
 
 
 [strat_1]
+# script will stop after sending this amount of messages
 messages_count = 1_000_000
 message_timeout = 10
-
+# highload or ever_wallet
+wallet_type = "highload"
 
 [strat_2]
+# if this is less than accounts number then 1 account will be used for multiple parallel transactions in the same batch
 messages_per_batch = 100
-message_timeout = 10
-batch_interval = 10
-batch_count = 10
+message_timeout = 20
+batch_interval = 5
+# script will stop after sending this amount of batches with messages
+batch_count = 100
+# type of wallet that will be used in test
 # highload or ever_wallet
-wallet_type = "ever_wallet"
+wallet_type = "highload"

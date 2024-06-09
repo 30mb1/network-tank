@@ -7,7 +7,7 @@ import tomllib
 
 import nekoton as nt
 
-from src.utils.common import get_accounts_file, send_tx, TxData, WalletType
+from src.utils.common import get_accounts_file, send_tx, TxData, WalletType, get_accounts_seed, get_accounts
 from src.utils.config import Config
 
 parser = argparse.ArgumentParser()
@@ -19,21 +19,27 @@ async def main():
     with open(args.config, "rb") as f:
         raw_config: Config = tomllib.load(f)
 
-    transport = nt.JrpcTransport(raw_config["common"]["jrpc"])
+    common_config = raw_config["common"]
+    strat_config = raw_config["strat_2"]
+
+    transport = nt.JrpcTransport(common_config["jrpc"])
     await transport.check_connection()
 
-    wallet_type = raw_config["strat_2"]["wallet_type"]
     # initializing wallets
-    accounts = get_accounts_file(raw_config["common"]["keys_file"], transport, type_=wallet_type)
+    wallet_type = strat_config["wallet_type"]
+    accounts = get_accounts(transport, common_config, wallet_type)
+
     msgs_sent = 0
-    batch_count = raw_config["strat_2"]["batch_count"]
-    messages_per_batch = raw_config["strat_2"]["messages_per_batch"]
-    batch_interval = raw_config["strat_2"]["batch_interval"]
-    message_timeout = raw_config["strat_2"]["message_timeout"]
+    batch_count = strat_config["batch_count"]
+    messages_per_batch = strat_config["messages_per_batch"]
+    batch_interval = strat_config["batch_interval"]
+    message_timeout = strat_config["message_timeout"]
     total_msgs = batch_count * messages_per_batch
 
-    logging.info(f"Sending {total_msgs} messages from {len(accounts)} accounts via batches: "
-                 f"{batch_count} with {messages_per_batch} messages each per {batch_interval} secs")
+    logging.info(
+        f"Sending {total_msgs} messages from {len(accounts)} accounts via batches: "
+        f"{batch_count} with {messages_per_batch} messages each per {batch_interval} secs"
+    )
     accs_queue = queue.Queue()
     for acc in accounts:
         accs_queue.put(acc)
@@ -50,7 +56,7 @@ async def main():
                 sender_account = accs_queue.get()
                 accs_queue.put(sender_account)
                 dst_acc = random.choice(accounts)
-                tx_data: TxData = {'dst': dst_acc.address, **tx_base}  # type: ignore
+                tx_data: TxData = {"dst": dst_acc.address, **tx_base}  # type: ignore
                 task = tg.create_task(send_tx(sender_account, tx_data, retry_count=100, timeout=message_timeout + 100))
                 task.add_done_callback(send_callback)
 

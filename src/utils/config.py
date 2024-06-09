@@ -9,6 +9,8 @@ class GiverAccType(StrEnum):
 
 class CommonConfig(TypedDict):
     keys_file: str
+    seed_phrase: str
+    accounts_num: int
     jrpc: str
     giver_acc_type: GiverAccType
     giver_secret_key: str
@@ -29,6 +31,7 @@ class FundingConfig(TypedDict):
 class Strat1(TypedDict):
     messages_count: int
     message_timeout: int
+    wallet_type: WalletType
 
 
 class Strat2(TypedDict):
