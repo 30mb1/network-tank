@@ -10,6 +10,8 @@ virtualenv -p python3 .venv
 ```bash
 source .venv/bin/activate
 pdm add ${PATH_TO_LOCAL_NEKOTON_BUILD}
+# OR
+pip install ${PATH_TO_LOCAL_NEKOTON_BUILD}
 ```
 ## Config
 1. Crete .toml config from template and fill it with your data
