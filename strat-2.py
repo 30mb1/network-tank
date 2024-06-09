@@ -51,7 +51,7 @@ async def main():
                 accs_queue.put(sender_account)
                 dst_acc = random.choice(accounts)
                 tx_data: TxData = {'dst': dst_acc.address, **tx_base}  # type: ignore
-                task = tg.create_task(send_tx(sender_account, tx_data, retry_count=100, timeout=message_timeout + 2))
+                task = tg.create_task(send_tx(sender_account, tx_data, retry_count=100, timeout=message_timeout + 100))
                 task.add_done_callback(send_callback)
 
     tasks = []
