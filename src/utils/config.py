@@ -43,9 +43,14 @@ class Strat2(TypedDict):
     wallet_type: WalletType
 
 
+class Strat3(Strat2):
+    process_count: int
+
+
 class Config(TypedDict):
     title: str
     common: CommonConfig
     funding: FundingConfig
     strat_1: Strat1
     strat_2: Strat2
+    strat_3: Strat3

@@ -40,3 +40,16 @@ batch_count = 100
 # type of wallet that will be used in test
 # highload or ever_wallet
 wallet_type = "highload"
+
+
+[strat_3]
+process_count = 2
+# if this is less than accounts number then 1 account will be used for multiple parallel transactions in the same batch
+messages_per_batch = 100
+message_timeout = 20
+batch_interval = 5
+# script will stop after sending this amount of batches with messages
+batch_count = 100
+# type of wallet that will be used in test
+# highload or ever_wallet
+wallet_type = "highload"
