@@ -129,6 +129,34 @@ async def send_tx(
     raise Exception(f"Timeout while sending tx")
 
 
+async def send_tx_batch(
+    account: HighloadWalletV2, txs: List[TxData], retry_count=3, timeout=60, silent=True
+) -> nt.Transaction:
+    messages: List[Tuple[nt.Message, 3]] = []
+    for tx in txs:
+        message = nt.Message(
+            header=nt.InternalMessageHeader(  # type: ignore
+                value=tx["value"],  # type: ignore
+                dst=tx["dst"],
+                bounce=tx["bounce"],
+            ),
+            body=tx.get("payload"),
+        )
+        messages.append((message, 3))
+    for i in range(retry_count):
+        try:
+            return await asyncio.wait_for(account.send_raw(messages, txs[0]["timeout"]), timeout=timeout)
+        except TimeoutError:
+            if not silent:
+                logging.error(
+                    f"Timeout#{i} while sending txs from {short_addr(account.address)} retrying..."
+                )
+        except RuntimeError:
+            if not silent:
+                logging.error(f"Message expired#{i}, retrying...")
+    raise Exception(f"Timeout while sending tx")
+
+
 class SyncThread(Thread):
     result = None
 

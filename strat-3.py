@@ -5,10 +5,11 @@ import queue
 import random
 import tomllib
 from multiprocessing import Pool
+from typing import List
 
 import nekoton as nt
 
-from src.utils.common import send_tx, TxData, get_accounts
+from src.utils.common import TxData, get_accounts, send_tx_batch
 from src.utils.config import Config
 
 parser = argparse.ArgumentParser()
@@ -51,21 +52,24 @@ def run_batch_loop(idx):
         for acc in accounts:
             accs_queue.put(acc)
 
-        def send_callback(*_):
+        def send_callback(task, *args):
             nonlocal msgs_sent
             msgs_sent += 1
             logging.info(f"{base}Total {msgs_sent} messages sent")
 
         async def send_batch():
-            tx_base = {"value": nt.Tokens("0.1"), "payload": nt.Cell(), "bounce": False, "timeout": message_timeout}
+            tx_base = {"value": nt.Tokens("0.1"), "payload": None, "bounce": False, "timeout": message_timeout}
             async with asyncio.TaskGroup() as tg:
                 for _ in range(messages_per_batch):
                     sender_account = accs_queue.get()
                     accs_queue.put(sender_account)
-                    dst_acc = random.choice(accounts)
-                    tx_data: TxData = {"dst": dst_acc.address, **tx_base}  # type: ignore
+                    txs: List[TxData] = []  # type: ignore
+                    for j in range(strat_config['internals_per_message']):
+                        dst_acc = random.choice(accounts)
+                        txs.append({"dst": dst_acc.address, **tx_base})
                     task = tg.create_task(
-                        send_tx(sender_account, tx_data, retry_count=100, timeout=message_timeout + 100))
+                        send_tx_batch(sender_account, txs, retry_count=100, timeout=message_timeout + 100)
+                    )
                     task.add_done_callback(send_callback)
 
         tasks = []

@@ -45,6 +45,7 @@ class Strat2(TypedDict):
 
 class Strat3(Strat2):
     process_count: int
+    internals_per_message: int
 
 
 class Config(TypedDict):
