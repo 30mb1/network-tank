@@ -52,10 +52,13 @@ def run_batch_loop(idx):
         for acc in accounts:
             accs_queue.put(acc)
 
-        def send_callback(task, *args):
-            nonlocal msgs_sent
-            msgs_sent += 1
-            logging.info(f"{base}Total {msgs_sent} messages sent")
+        def send_callback(task: asyncio.Task, *args):
+            if task.exception() is None:
+                nonlocal msgs_sent
+                msgs_sent += 1
+                logging.info(f"{base}Total {msgs_sent} messages sent")
+            else:
+                logging.error(f"{base}Error while sending message: {task.exception()}")
 
         async def send_batch():
             tx_base = {"value": nt.Tokens("0.1"), "payload": None, "bounce": False, "timeout": message_timeout}
